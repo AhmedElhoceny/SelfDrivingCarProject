@@ -20,6 +20,14 @@ from datetime import datetime
 
 import tkinter as tk
 
+import RPi.GPIO as GPIO
+import time
+import sys
+
+OutPut_Pins = [15 , 16 , 18 , 19 ,21 , 31 , 32 , 33 , 35 , 36 ]
+
+
+        
 #######################################
 steeringSen = 1 # Steering Sensitivity
 scale= 21  # Steering scale to middel
@@ -47,19 +55,6 @@ def predict(img,input_details , output_details):
     predictions = interpreter.get_tensor(output_details[0]['index'])[0]  
     return(predictions)
 
-#cv2.namedWindow("Input")
-
-
-# def preProcess(img):
-#     #cv2.imshow("Input",img)
-#     img = img[54:120, :, :]
-#     img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
-#     img = cv2.GaussianBlur(img, (3, 3), 0)
-#     img = cv2.resize(img, (200, 66))
-#     img = img / 255
-#     #cv2. imshow("Input",img)
-#     cv2.waitKey(50)
-#     return img
 
 
 def mask2(image):
@@ -76,9 +71,6 @@ def mask2(image):
         x,y,w,h = cv2.boundingRect(c)
         cv2.rectangle(original, (x, y), (x + w, y + h), (36,255,12), 2)
 
-    #cv2.imshow('mask', mask)
-#     cv2.imshow('original', original)
-#     cv2.waitKey()
     return original
 
 
@@ -95,6 +87,14 @@ def preProcess(img):
 
 
 ######################################################
+def init():
+    GPIO.setmode(GPIO.BOARD)		#set pin numbering system
+    GPIO.setwarnings(False)			#disable warnings
+
+
+    for Item in OutPut_Pins:
+        GPIO.setup(Item,GPIO.OUT)
+        
 def StopAllProcess():
 
     init()
@@ -310,30 +310,10 @@ def altra():
 # 
 
     
-def TackPic():
-    print("Hello...............................")
-    camera= PiCamera();
-    camera.start_preview();
-    time.sleep(0.3);
-    camera.capture(Pic);
-    camera.close();
-    return(Pic)
 
 
 
-import RPi.GPIO as GPIO
-import time
-import sys
 
-OutPut_Pins = [15 , 16 , 18 , 19 ,21 , 31 , 32 , 33 , 35 , 36 ]
-
-def init():
-    GPIO.setmode(GPIO.BOARD)		#set pin numbering system
-    GPIO.setwarnings(False)			#disable warnings
-
-
-    for Item in OutPut_Pins:
-        GPIO.setup(Item,GPIO.OUT)
 
 # def Move():
 #     init()
@@ -737,23 +717,16 @@ while not keyboard.is_pressed('x+z'):
             
 #             print(old_st)
             
-#         if keyboard.is_pressed('r'):
-#             if record == 0: print('Recording Started ...')
-#             record += 1
-#             sleep(0.300)
-#         if record == 1:
-#             img = wM.getImg(True, size=[240, 120])
-#             dcM.saveData(img, steering)
-#         elif record == 2:
-#             dcM.saveLog()
-#             record = 0
-#         
-        print("STOP Record")
+        if keyboard.is_pressed('r'):
+            if record == 0: print('Recording Started ...')
+            record += 1
+            sleep(0.300)
+        if record == 1:
+            img = wM.getImg(True, size=[240, 120])
+            dcM.saveData(img, steering)
+        elif record == 2:
+            dcM.saveLog()
+            record = 0
+            print("STOP Record")
         
-init()        
-GPIO.output(35 , 1)
-GPIO.output(36 , 1)
-GPIO.output(15 , 1)
-GPIO.output(16 , 1)
-GPIO.output(18 , 1)
-GPIO.output(19 , 1)
+StopAllProcess()
